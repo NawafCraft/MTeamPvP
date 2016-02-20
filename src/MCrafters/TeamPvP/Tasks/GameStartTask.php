@@ -15,7 +15,7 @@ use pocketmine\math\Vector3;
 class GameStartTask extends PluginTask
 {
 
-    public $seconds = 15;
+    public $seconds = 0;
 
     public function __construct(\MCrafters\TeamPvP\TeamPvP $plugin)
     {
@@ -25,7 +25,7 @@ class GameStartTask extends PluginTask
 
     public function onRun($tick)
     {
-        $this->seconds -= 1;
+        $this->seconds--;
 
         foreach ($this->plugin->reds as $r) {
             foreach ($this->plugin->blues as $b) {
@@ -33,17 +33,21 @@ class GameStartTask extends PluginTask
                     $this->plugin->getServer()->getPlayer($r)->sendPopup("§eThe game will start in {$this->seconds} ".($this->seconds<=1?"second":"seconds"));
                     $this->plugin->getServer()->getPlayer($b)->sendPopup("§eThe game will start in {$this->seconds} ".($this->seconds<=1?"second":"seconds"));
 
-                    if ($this->seconds == 1) {
+                    if ($this->seconds == -1) {
                         getPlayer($r)->teleport(new Vector3($this->plugin->yml["red_enter_x"], $this->plugin->yml["red_enter_y"], $this->plugin->yml["red_enter_z"]));
                         $this->plugin->getServer()->getPlayer($b)->teleport(new Vector3($this->plugin->yml["blue_enter_x"], $this->plugin->yml["blue_enter_y"], $this->plugin->yml["blue_enter_z"]));
                         $this->plugin->getServer()->getPlayer($r)->getInventory()->addItem(Item::fromString($i));
                         $this->plugin->getServer()->getPlayer($b)->getInventory()->addItem(Item::fromString($i));
                         $this->plugin->gameStarted = true;
-                        $this->seconds = 15;
+                        $this->setTime(15);
                         Tasks::cancelTask($this->getTaskId());
                     }
                 }
             }
         }
+    }
+    public function setTime($time){
+        return $this->seconds = $time;
+    }
     }
 }
